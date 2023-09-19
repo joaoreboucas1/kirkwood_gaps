@@ -3,7 +3,17 @@ A simulation of [Kirkwood Gaps](https://en.wikipedia.org/wiki/Kirkwood_gap), pec
 
 ## Build
 ```console
+    $ gcc kirkwood.c -o kirkwood -lm -lraylib
+```
+
+The user can also build with the `-fopenmp` flag for speeding up the simulation (doesn't affect real-time visualization):
+```console
     $ gcc kirkwood.c -o kirkwood -lm -lraylib -fopenmp
+```
+To use multithreading, set the `OMP_NUM_THREADS` environment variable before running the code:
+```console
+    $ export OMP_NUM_THREADS=4 # Set the number of threads you want to use
+    $ ./kirkwood p 63000
 ```
 
 ## Run
@@ -11,4 +21,3 @@ A simulation of [Kirkwood Gaps](https://en.wikipedia.org/wiki/Kirkwood_gap), pec
     $ ./kirkwood v # Visualize system in real time
     $ ./kirkwood p 10000 # Generate distance histogram after 10000 time steps
 ```
-
