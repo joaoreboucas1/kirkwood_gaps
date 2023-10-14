@@ -129,8 +129,8 @@ int main(int argc, char* argv[])
         printf("ERROR: could not find program mode.\n");
         exit(1);
     }
-    if      (*argv[1] == 'v') mode = MODE_VISUALIZE;
-    else if (*argv[1] == 'p') mode = MODE_PLOT;
+    if      (*argv[1] == 'vis') mode = MODE_VISUALIZE;
+    else if (*argv[1] == 'plot') mode = MODE_PLOT;
 
     Particle sys[NUM_ASTEROIDS + 2];
     initialize_sys(sys);

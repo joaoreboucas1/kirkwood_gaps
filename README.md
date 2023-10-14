@@ -20,6 +20,6 @@ To use multithreading, set the `OMP_NUM_THREADS` environment variable before run
 
 ## Run
 ```console
-    $ ./kirkwood v # Visualize system in real time
-    $ ./kirkwood p 10000 # Generate distance histogram after 10000 time steps
+    $ ./kirkwood vis # Visualize system in real time
+    $ ./kirkwood plot 10000 # Generate distance histogram after 10000 time steps
 ```
