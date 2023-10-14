@@ -9,7 +9,7 @@
 
 #define G 1.0f
 #define M_SUN 1.0f
-#define NUM_ASTEROIDS 10000
+#define NUM_ASTEROIDS 2500
 
 typedef struct {
     Vector2 pos;
@@ -96,9 +96,8 @@ void initialize_sys(Particle *sys)
     }
 }
 
-void update_sys(Particle *sys, int steps)
+void update_sys(Particle *sys, int steps, float dt)
 {
-    const float dt = 0.01;
     for (int j = 0; j < steps; j++) {
         #pragma omp parallel for
         for (int i = 0; i < NUM_ASTEROIDS + 2; i++) {
@@ -127,10 +126,12 @@ int main(int argc, char* argv[])
         while (!WindowShouldClose())
         {
             float dt = GetFrameTime();
+            update_sys(sys, 1, dt);
+
+            // Render system
             BeginDrawing();
                 ClearBackground(BLACK);
                 for (int i = 0; i < NUM_ASTEROIDS + 2; i++) {
-                    if (i > 0) update_particle(sys, i, dt);
                     DrawParticle(sys[i]);
                 }
             EndDrawing();
@@ -144,8 +145,9 @@ int main(int argc, char* argv[])
             exit(1);
         }
         const int steps = atoi(argv[2]);
-        printf("Evolving system for %d steps using dt = %.3f...\n", steps, 0.01);
-        update_sys(sys, steps);
+        const float dt = 0.01;
+        printf("Evolving system for %d steps using dt = %.3f...\n", steps, dt);
+        update_sys(sys, steps, dt);
         
         printf("Finished calculations, saving distance data to data.txt...\n");
 
