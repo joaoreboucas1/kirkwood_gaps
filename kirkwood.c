@@ -106,21 +106,36 @@ void update_sys(Particle *sys, int steps, float dt)
     }
 }
 
+typedef enum {
+    MODE_VISUALIZE,
+    MODE_PLOT,
+} Mode;
+
+void usage(void)
+{
+    printf("USAGE: ./kirkwood <MODE>\n");
+    printf("    modes:\n");
+    printf("        v: real-time visualization\n");
+    printf("        p <N>: plot distance distribution after N steps. Note that one period of Jupiter is approximately 630 time steps.\n");
+}
+
 int main(int argc, char* argv[])
 {
+    Mode mode;
+    
+    // Parse command-line arguments
     if (argc < 2) {
-        printf("USAGE: ./kirkwood <MODE>\n");
-        printf("    modes:\n");
-        printf("        v: real-time visualization\n");
-        printf("        p <N>: plot distance distribution after N steps. Note that one period of Jupiter is approximately 630 time steps.\n");
-        printf("ERROR: could not find run mode.\n");
+        usage();
+        printf("ERROR: could not find program mode.\n");
         exit(1);
     }
+    if      (*argv[1] == 'v') mode = MODE_VISUALIZE;
+    else if (*argv[1] == 'p') mode = MODE_PLOT;
 
     Particle sys[NUM_ASTEROIDS + 2];
     initialize_sys(sys);
 
-    if (*argv[1] == 'v') {
+    if (mode == MODE_VISUALIZE) {
         InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Kirkwood Gaps");
         SetTargetFPS(60);
         while (!WindowShouldClose())
@@ -138,22 +153,30 @@ int main(int argc, char* argv[])
         }
         CloseWindow();
     }
-    else if (*argv[1] == 'p')
+    else if (mode == MODE_PLOT)
     {
         if (argc < 3) {
-            printf("ERROR: no number of steps provided\n");
+            usage();
+            printf("ERROR: no number of time steps provided for plotting mode\n");
             exit(1);
         }
         const int steps = atoi(argv[2]);
+        if (steps <= 0) {
+            usage();
+            printf("ERROR: invalid number of time steps, provide a positive integer\n");
+            exit(1);
+        }
+
         const float dt = 0.01;
-        printf("Evolving system for %d steps using dt = %.3f...\n", steps, dt);
+        printf("Evolving system for %d time steps using dt = %.3f...\n", steps, dt);
+        
         update_sys(sys, steps, dt);
         
-        printf("Finished calculations, saving distance data to data.txt...\n");
+        printf("Finished calculations, saving distance data to data.tmp...\n");
 
-        FILE *f = fopen("data.txt", "w");
+        FILE *f = fopen("data.tmp", "w");
         if (f == NULL) {
-            printf("ERROR: could not open file data.txt");
+            printf("ERROR: could not open file data.tmp");
             exit(1);
         }
         for (int i = 0; i < NUM_ASTEROIDS; i++) {
@@ -161,11 +184,12 @@ int main(int argc, char* argv[])
             fprintf(f, "%f ", d);
         }
         fclose(f);
-        printf("Saved distance data to data.txt...\n");
+        printf("Saved distance data to data.tmp...\n");
         printf("Calling python plot backend...\n");
         system("python3 plot.py");
-        system("rm ./data.txt");
+        system("rm ./data.tmp");
         printf("Simulation finished successfully!\n");
+        printf("Distance plot saved in plot.pdf!\n");
     }
     return 0;
 }
